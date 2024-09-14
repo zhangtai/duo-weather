@@ -18,11 +18,24 @@ class WeatherService {
             throw URLError(.badURL)
         }
 
+        print("Fetching data from URL: \(urlString)")
         let (data, _) = try await URLSession.shared.data(from: url)
+        print("Received data from API")
         let decoder = JSONDecoder()
         let apiResponse = try decoder.decode(APIResponse.self, from: data)
+        print("Decoded API response")
 
         return WeatherData(city: city, latitude: latitude, longitude: longitude, daily: apiResponse.daily)
+    }
+
+    // Add this test function
+    func testFetch() async {
+        do {
+            let testData = try await fetchWeather(for: "Test City", latitude: 40.7128, longitude: -74.0060)
+            print("Test fetch successful. City: \(testData.city)")
+        } catch {
+            print("Test fetch failed with error: \(error)")
+        }
     }
 }
 

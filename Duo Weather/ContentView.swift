@@ -4,6 +4,7 @@
 //
 //  Created by Tying on 2024/9/14.
 //
+// ContentView.swift
 
 import SwiftUI
 
@@ -14,39 +15,34 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack {
-                    if viewModel.isLoading {
-                        ProgressView()
-                    } else if let errorMessage = viewModel.errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                    } else if !viewModel.weatherData.isEmpty {
-                        Text("Temperature Comparison")
-                            .font(.headline)
-                        TemperatureChart(weatherData: viewModel.weatherData)
+            VStack {
+                Text("Weather Compare")
+                    .font(.largeTitle)
 
-                        Text("Precipitation Comparison")
-                            .font(.headline)
-                        PrecipitationChart(weatherData: viewModel.weatherData)
-                    } else {
-                        Text("Select cities to compare weather")
-                    }
+                Button("Select Cities") {
+                    showingCitySelection = true
+                }
+
+                if viewModel.isLoading {
+                    ProgressView()
+                } else if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                } else if !viewModel.weatherData.isEmpty {
+                    Text("Weather data loaded")
+                } else {
+                    Text("No weather data")
                 }
             }
-            .navigationTitle("Weather Compare")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Select Cities") {
-                        showingCitySelection = true
-                    }
-                }
+            .onAppear {
+                print("ContentView appeared")
             }
             .sheet(isPresented: $showingCitySelection) {
                 NavigationView {
                     CitySelectionView(selectedCities: $selectedCities)
                         .navigationBarItems(trailing: Button("Done") {
                             showingCitySelection = false
+                            print("Selected cities: \(selectedCities)")
                             Task {
                                 await viewModel.fetchWeatherData(for: selectedCities)
                             }
@@ -60,5 +56,11 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .onAppear {
+                print("ContentView appeared")
+                Task {
+                    await WeatherService.shared.testFetch()
+                }
+            }
     }
 }
