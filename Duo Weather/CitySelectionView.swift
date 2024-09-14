@@ -18,6 +18,8 @@ struct CitySelectionView: View {
     @Binding var selectedCities: [City]
 
     let cities = [
+        City(name: "Guangzhou", latitude: 23.1622, longitude: 113.2353),
+        City(name: "Yilan", latitude: 46.3320, longitude: 129.5610),
         City(name: "New York", latitude: 40.7128, longitude: -74.0060),
         City(name: "London", latitude: 51.5074, longitude: -0.1278),
         City(name: "Tokyo", latitude: 35.6762, longitude: 139.6503),
