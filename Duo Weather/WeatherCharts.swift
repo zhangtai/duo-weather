@@ -14,10 +14,21 @@ struct TemperatureChart: View {
     var body: some View {
         Chart {
             ForEach(weatherData) { cityData in
-                ForEach(Array(zip(cityData.daily.time, cityData.daily.temperatureMax)), id: \.0) { date, temp in
+                ForEach(Array(zip(cityData.daily.time, zip(cityData.daily.temperatureMin, cityData.daily.temperatureMax))), id: \.0) { date, temps in
+                    AreaMark(
+                        x: .value("Date", date),
+                        yStart: .value("Min Temp", temps.0),
+                        yEnd: .value("Max Temp", temps.1)
+                    )
+                    .foregroundStyle(by: .value("City", cityData.city))
+                    .opacity(0.5)
+                }
+
+                // Add a line for the average temperature
+                ForEach(Array(zip(cityData.daily.time, zip(cityData.daily.temperatureMin, cityData.daily.temperatureMax))), id: \.0) { date, temps in
                     LineMark(
                         x: .value("Date", date),
-                        y: .value("Temperature", temp)
+                        y: .value("Avg Temp", (temps.0 + temps.1) / 2)
                     )
                     .foregroundStyle(by: .value("City", cityData.city))
                 }

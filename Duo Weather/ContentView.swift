@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  Duo Weather
 //
-//  Created by Tying on 2024/9/14.
+//  Created by zhangt.ai on 2024/9/14.
 //
 
 import SwiftUI
@@ -47,8 +47,12 @@ struct ContentView: View {
                     CitySelectionView(selectedCities: $selectedCities)
                         .navigationBarItems(trailing: Button("Done") {
                             showingCitySelection = false
-                            Task {
-                                await viewModel.fetchWeatherData(for: selectedCities)
+                            if !selectedCities.isEmpty {
+                                Task {
+                                    await viewModel.fetchWeatherData(for: selectedCities)
+                                }
+                            } else {
+                                viewModel.weatherData.removeAll()
                             }
                         })
                 }

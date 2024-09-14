@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct WeatherData: Codable, Identifiable {
+struct WeatherData: Codable, Identifiable, Equatable {
     let id = UUID()
     let city: String
     let latitude: Double
@@ -20,9 +20,17 @@ struct WeatherData: Codable, Identifiable {
         self.longitude = longitude
         self.daily = daily
     }
+
+    static func == (lhs: WeatherData, rhs: WeatherData) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.city == rhs.city &&
+        lhs.latitude == rhs.latitude &&
+        lhs.longitude == rhs.longitude &&
+        lhs.daily == rhs.daily
+    }
 }
 
-struct DailyWeather: Codable {
+struct DailyWeather: Codable, Equatable {
     let time: [String]
     let temperatureMax: [Double]
     let temperatureMin: [Double]

@@ -2,7 +2,7 @@
 //  WeatherComparisonViewModel.swift
 //  Duo Weather
 //
-//  Created by Tying on 2024/9/14.
+//  Created by zhangt.ai on 2024/9/14.
 //
 
 import Foundation
@@ -17,29 +17,22 @@ class WeatherComparisonViewModel: ObservableObject {
         print("Fetching weather data for cities: \(cities)")
         isLoading = true
         errorMessage = nil
-        weatherData = []
+
+        // Clear previous data
+        weatherData.removeAll()
 
         do {
-            var newWeatherData: [WeatherData] = []
             for city in cities {
                 print("Fetching data for \(city.name)")
                 let data = try await WeatherService.shared.fetchWeather(for: city.name, latitude: city.latitude, longitude: city.longitude)
                 print("Received data for \(city.name)")
-                newWeatherData.append(data)
-            }
-            // Update weatherData on the main thread
-            await MainActor.run {
-                self.weatherData = newWeatherData
+                weatherData.append(data)
             }
         } catch {
             print("Error fetching weather data: \(error)")
-            await MainActor.run {
-                self.errorMessage = "Failed to fetch weather data: \(error.localizedDescription)"
-            }
+            errorMessage = "Failed to fetch weather data: \(error.localizedDescription)"
         }
 
-        await MainActor.run {
-            self.isLoading = false
-        }
+        isLoading = false
     }
 }
