@@ -6,56 +6,59 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @StateObject private var viewModel = WeatherComparisonViewModel()
+    @State private var selectedCities: [City] = []
+    @State private var showingCitySelection = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationView {
+            ScrollView {
+                VStack {
+                    if viewModel.isLoading {
+                        ProgressView()
+                    } else if let errorMessage = viewModel.errorMessage {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                    } else if !viewModel.weatherData.isEmpty {
+                        Text("Temperature Comparison")
+                            .font(.headline)
+                        TemperatureChart(weatherData: viewModel.weatherData)
+
+                        Text("Precipitation Comparison")
+                            .font(.headline)
+                        PrecipitationChart(weatherData: viewModel.weatherData)
+                    } else {
+                        Text("Select cities to compare weather")
                     }
                 }
-                .onDelete(perform: deleteItems)
             }
+            .navigationTitle("Weather Compare")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button("Select Cities") {
+                        showingCitySelection = true
                     }
                 }
             }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            .sheet(isPresented: $showingCitySelection) {
+                NavigationView {
+                    CitySelectionView(selectedCities: $selectedCities)
+                        .navigationBarItems(trailing: Button("Done") {
+                            showingCitySelection = false
+                            Task {
+                                await viewModel.fetchWeatherData(for: selectedCities)
+                            }
+                        })
+                }
             }
         }
     }
 }
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
