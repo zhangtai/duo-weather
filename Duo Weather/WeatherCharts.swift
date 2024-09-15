@@ -58,12 +58,19 @@ struct PrecipitationChart: View {
     var body: some View {
         Chart {
             ForEach(weatherData) { cityData in
-                ForEach(Array(zip(cityData.daily.time, cityData.daily.precipitation)), id: \.0) { date, precip in
+                ForEach(cityData.daily.time.indices, id: \.self) { index in
                     BarMark(
-                        x: .value("Date", weekdayFrom(dateString: date)),
-                        y: .value("Precipitation", precip)
+                        x: .value("Date", weekdayFrom(dateString: cityData.daily.time[index])),
+                        y: .value("Precipitation", cityData.daily.precipitation[index])
                     )
                     .foregroundStyle(by: .value("City", cityData.city))
+                    .position(by: .value("City", cityData.city))
+                    .annotation(position: .top) {
+                        Text(String(format: "%.1f", cityData.daily.precipitation[index]))
+                            .font(.caption2)
+                            .rotationEffect(.degrees(-90))
+                            .offset(y: -5)
+                    }
                 }
             }
         }
