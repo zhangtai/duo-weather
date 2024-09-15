@@ -22,11 +22,11 @@ struct ContentView: View {
                         Text(errorMessage)
                             .foregroundColor(.red)
                     } else if !viewModel.weatherData.isEmpty {
-                        Text("Temperature Comparison")
+                        Text("Temperature")
                             .font(.headline)
                         TemperatureChart(weatherData: viewModel.weatherData)
 
-                        Text("Precipitation Comparison")
+                        Text("Precipitation")
                             .font(.headline)
                         PrecipitationChart(weatherData: viewModel.weatherData)
                     } else {
@@ -34,7 +34,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Weather Compare")
+            .navigationTitle("Duo Weather")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Select Cities") {
