@@ -38,6 +38,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Select Cities") {
+                        selectedCities = []
                         showingCitySelection = true
                     }
                 }
