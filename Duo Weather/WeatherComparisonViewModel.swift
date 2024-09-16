@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 @MainActor
 class WeatherComparisonViewModel: ObservableObject {
@@ -13,19 +14,29 @@ class WeatherComparisonViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    private let weatherService: WeatherService
+
+    init(weatherService: WeatherService = WeatherService.shared) {
+        self.weatherService = weatherService
+    }
+
     func fetchWeatherData(for cities: [City]) async {
-        print("Fetching weather data for cities: \(cities)")
+        print("Fetching weather data for cities: \(cities.map { $0.name ?? "Unknown" })")
+
         isLoading = true
         errorMessage = nil
-
-        // Clear previous data
         weatherData.removeAll()
 
         do {
             for city in cities {
-                print("Fetching data for \(city.name)")
-                let data = try await WeatherService.shared.fetchWeather(for: city.name, latitude: city.latitude, longitude: city.longitude)
-                print("Received data for \(city.name)")
+                guard let name = city.name, let latitude = city.latitude as? Double, let longitude = city.longitude as? Double else {
+                    print("Invalid city data")
+                    continue
+                }
+
+                print("Fetching data for \(name)")
+                let data = try await weatherService.fetchWeather(for: name, latitude: latitude, longitude: longitude)
+                print("Received data for \(name)")
                 weatherData.append(data)
             }
         } catch {
