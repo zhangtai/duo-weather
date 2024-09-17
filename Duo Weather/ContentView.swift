@@ -35,6 +35,11 @@ struct ContentView: View {
                         Text("Precipitation")
                             .font(.headline)
                         PrecipitationChart(weatherData: viewModel.weatherData)
+                        
+                        Text("Sunrise & Sunset")
+                            .font(.headline)
+                        SunriseSunsetChart(weatherData: viewModel.weatherData)
+                            .frame(height: 200)
                     } else {
                         Text("Select cities to compare weather")
                     }

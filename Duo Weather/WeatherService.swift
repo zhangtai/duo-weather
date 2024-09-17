@@ -12,7 +12,7 @@ class WeatherService {
     private init() {}
 
     func fetchWeather(for city: String, latitude: Double, longitude: Double) async throws -> WeatherData {
-        let urlString = "https://api.open-meteo.com/v1/forecast?latitude=\(latitude)&longitude=\(longitude)&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto"
+        let urlString = "https://api.open-meteo.com/v1/forecast?latitude=\(latitude)&longitude=\(longitude)&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset&timezone=auto"
 
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
