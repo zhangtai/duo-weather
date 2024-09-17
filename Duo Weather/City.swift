@@ -9,12 +9,14 @@ import Foundation
 import SwiftData
 
 @Model
-class City {
+final class City: Identifiable {
+    let id: UUID
     var name: String
     var latitude: Double
     var longitude: Double
 
     init(name: String, latitude: Double, longitude: Double) {
+        self.id = UUID()
         self.name = name
         self.latitude = latitude
         self.longitude = longitude

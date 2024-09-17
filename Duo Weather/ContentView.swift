@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import MapKit
 
 struct ContentView: View {
     @StateObject private var viewModel = WeatherComparisonViewModel()
@@ -17,13 +18,16 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack {
+                VStack(spacing: 20) {
                     if viewModel.isLoading {
                         ProgressView()
                     } else if let errorMessage = viewModel.errorMessage {
                         Text(errorMessage)
                             .foregroundColor(.red)
                     } else if !viewModel.weatherData.isEmpty {
+                        MapView(cities: selectedCities)
+                            .padding(.horizontal)
+
                         Text("Temperature")
                             .font(.headline)
                         TemperatureChart(weatherData: viewModel.weatherData)
@@ -35,6 +39,7 @@ struct ContentView: View {
                         Text("Select cities to compare weather")
                     }
                 }
+                .padding()
             }
             .navigationTitle("Duo Weather")
             .toolbar {
@@ -68,7 +73,6 @@ struct ContentView: View {
         }
     }
 }
-
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
