@@ -4,23 +4,26 @@
 //
 //  Created by Tying on 2024/9/14.
 //
+
 import SwiftUI
+import SwiftData
 
 struct CitySelectionView: View {
     @Binding var selectedCities: [City]
-    @ObservedObject var cityManager: CityManager
+    @Query private var cities: [City]
     @State private var showingAddCity = false
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         List {
-            ForEach(cityManager.cities, id: \.self) { city in
+            ForEach(cities) { city in
                 Button(action: {
                     toggleCitySelection(city)
                 }) {
                     HStack {
-                        Text(city.name ?? "")
+                        Text(city.name)
                         Spacer()
-                        if selectedCities.contains(where: { $0.objectID == city.objectID }) {
+                        if selectedCities.contains(where: { $0.id == city.id }) {
                             Image(systemName: "checkmark")
                         }
                     }
@@ -35,12 +38,12 @@ struct CitySelectionView: View {
             }
         }
         .sheet(isPresented: $showingAddCity) {
-            AddEditCityView(cityManager: cityManager)
+            AddEditCityView()
         }
     }
 
     private func toggleCitySelection(_ city: City) {
-        if let index = selectedCities.firstIndex(where: { $0.objectID == city.objectID }) {
+        if let index = selectedCities.firstIndex(where: { $0.id == city.id }) {
             selectedCities.remove(at: index)
         } else {
             selectedCities.append(city)
@@ -48,9 +51,8 @@ struct CitySelectionView: View {
     }
 
     private func deleteCity(at offsets: IndexSet) {
-        offsets.forEach { index in
-            let city = cityManager.cities[index]
-            cityManager.deleteCity(city)
+        for index in offsets {
+            modelContext.delete(cities[index])
         }
     }
 }

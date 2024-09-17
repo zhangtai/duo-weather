@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     @StateObject private var viewModel = WeatherComparisonViewModel()
-    @StateObject private var cityManager = CityManager()
     @State private var selectedCities: [City] = []
     @State private var showingCitySelection = false
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         NavigationView {
@@ -45,7 +46,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showingCitySelection) {
                 NavigationView {
-                    CitySelectionView(selectedCities: $selectedCities, cityManager: cityManager)
+                    CitySelectionView(selectedCities: $selectedCities)
                         .navigationBarItems(trailing: Button("Done") {
                             showingCitySelection = false
                             if !selectedCities.isEmpty {
@@ -60,10 +61,14 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            cityManager.fetchCities()
+            let cityManager = CityManager(modelContext: modelContext)
+            if cityManager.getAllCities().isEmpty {
+                cityManager.preloadCities()
+            }
         }
     }
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

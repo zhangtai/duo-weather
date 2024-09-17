@@ -27,6 +27,6 @@ struct Duo_WeatherApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(for: City.self)
     }
 }

@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct AddEditCityView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var cityManager: CityManager
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     @State private var name = ""
     @State private var latitude = ""
     @State private var longitude = ""
@@ -25,19 +25,16 @@ struct AddEditCityView: View {
             }
             .navigationTitle("Add City")
             .navigationBarItems(
-                leading: Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
-                },
-                trailing: Button("Save") {
-                    saveCity()
-                }
+                leading: Button("Cancel") { dismiss() },
+                trailing: Button("Save") { saveCity() }
             )
         }
     }
 
     private func saveCity() {
         guard let lat = Double(latitude), let lon = Double(longitude) else { return }
-        cityManager.addCity(name: name, latitude: lat, longitude: lon)
-        presentationMode.wrappedValue.dismiss()
+        let newCity = City(name: name, latitude: lat, longitude: lon)
+        modelContext.insert(newCity)
+        dismiss()
     }
 }

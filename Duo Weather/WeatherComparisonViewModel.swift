@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import CoreData
+import SwiftData
 
 @MainActor
 class WeatherComparisonViewModel: ObservableObject {
@@ -21,7 +21,7 @@ class WeatherComparisonViewModel: ObservableObject {
     }
 
     func fetchWeatherData(for cities: [City]) async {
-        print("Fetching weather data for cities: \(cities.map { $0.name ?? "Unknown" })")
+        print("Fetching weather data for cities: \(cities.map { $0.name })")
 
         isLoading = true
         errorMessage = nil
@@ -29,17 +29,9 @@ class WeatherComparisonViewModel: ObservableObject {
 
         do {
             for city in cities {
-                guard let name = city.name else {
-                    print("Invalid city name")
-                    continue
-                }
-
-                let latitude = city.latitude
-                let longitude = city.longitude
-
-                print("Fetching data for \(name)")
-                let data = try await weatherService.fetchWeather(for: name, latitude: latitude, longitude: longitude)
-                print("Received data for \(name)")
+                print("Fetching data for \(city.name)")
+                let data = try await weatherService.fetchWeather(for: city.name, latitude: city.latitude, longitude: city.longitude)
+                print("Received data for \(city.name)")
                 weatherData.append(data)
             }
         } catch {
