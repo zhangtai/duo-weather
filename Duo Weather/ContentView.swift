@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var viewModel = WeatherComparisonViewModel()
+    @StateObject private var cityManager = CityManager()
     @State private var selectedCities: [City] = []
     @State private var showingCitySelection = false
 
@@ -38,14 +39,13 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Select Cities") {
-                        selectedCities = []
                         showingCitySelection = true
                     }
                 }
             }
             .sheet(isPresented: $showingCitySelection) {
                 NavigationView {
-                    CitySelectionView(selectedCities: $selectedCities)
+                    CitySelectionView(selectedCities: $selectedCities, cityManager: cityManager)
                         .navigationBarItems(trailing: Button("Done") {
                             showingCitySelection = false
                             if !selectedCities.isEmpty {
@@ -58,6 +58,9 @@ struct ContentView: View {
                         })
                 }
             }
+        }
+        .onAppear {
+            cityManager.fetchCities()
         }
     }
 }

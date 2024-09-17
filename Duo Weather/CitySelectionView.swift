@@ -8,12 +8,12 @@ import SwiftUI
 
 struct CitySelectionView: View {
     @Binding var selectedCities: [City]
-    @StateObject private var cityManager = CityManager()
+    @ObservedObject var cityManager: CityManager
     @State private var showingAddCity = false
 
     var body: some View {
         List {
-            ForEach(cityManager.cities) { city in
+            ForEach(cityManager.cities, id: \.self) { city in
                 Button(action: {
                     toggleCitySelection(city)
                 }) {

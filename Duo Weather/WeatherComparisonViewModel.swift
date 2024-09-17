@@ -29,10 +29,13 @@ class WeatherComparisonViewModel: ObservableObject {
 
         do {
             for city in cities {
-                guard let name = city.name, let latitude = city.latitude as? Double, let longitude = city.longitude as? Double else {
-                    print("Invalid city data")
+                guard let name = city.name else {
+                    print("Invalid city name")
                     continue
                 }
+
+                let latitude = city.latitude
+                let longitude = city.longitude
 
                 print("Fetching data for \(name)")
                 let data = try await weatherService.fetchWeather(for: name, latitude: latitude, longitude: longitude)

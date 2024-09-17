@@ -24,6 +24,27 @@ class CityManager: ObservableObject {
             }
         }
         fetchCities()
+
+        // Check if it's the first launch and pre-load cities if necessary
+        if UserDefaults.standard.bool(forKey: "HasPreloadedCities") == false {
+            preloadCities()
+            UserDefaults.standard.set(true, forKey: "HasPreloadedCities")
+        }
+    }
+    
+    private func preloadCities() {
+        let citiesToPreload = [
+            ("Guangzhou", 23.1622, 113.2353),
+            ("Yilan", 46.3320, 129.5610),
+            ("London", 51.5074, -0.1278),
+            ("Tokyo", 35.6762, 139.6503),
+            ("Sydney", -33.8688, 151.2093),
+            ("Pune", 18.516726, 73.856255)
+        ]
+
+        for (name, latitude, longitude) in citiesToPreload {
+            addCity(name: name, latitude: latitude, longitude: longitude)
+        }
     }
 
     func fetchCities() {
