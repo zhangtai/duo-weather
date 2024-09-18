@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 final class City: Identifiable {
-    let id: UUID
+    var id: UUID
     var name: String
     var latitude: Double
     var longitude: Double

@@ -8,7 +8,7 @@
 import Foundation
 
 struct WeatherData: Codable, Identifiable, Equatable {
-    let id = UUID()
+    var id = UUID()
     let city: String
     let latitude: Double
     let longitude: Double
