@@ -10,7 +10,6 @@ import Charts
 
 struct TemperatureChart: View {
     let weatherData: [WeatherData]
-
     var body: some View {
         Chart {
             ForEach(weatherData) { cityData in
@@ -43,6 +42,7 @@ struct TemperatureChart: View {
                 yStart: .value("Min Temp", temps.0),
                 yEnd: .value("Max Temp", temps.1)
             )
+            .interpolationMethod(.catmullRom)
             .foregroundStyle(by: .value("City", cityData.city))
             .opacity(0.3)
         }
@@ -55,13 +55,12 @@ struct TemperatureChart: View {
                 x: .value("Date", weekdayFrom(dateString: date)),
                 y: .value("Avg Temp", (temps.0 + temps.1) / 2)
             )
+            .interpolationMethod(.catmullRom)
             .foregroundStyle(by: .value("City", cityData.city))
         }
     }
 
     private func weekdayFrom(dateString: String) -> String {
-        // Implement this function to convert the date string to a weekday
-        // For example:
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         if let date = dateFormatter.date(from: dateString) {
