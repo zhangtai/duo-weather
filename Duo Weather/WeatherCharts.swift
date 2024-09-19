@@ -10,24 +10,66 @@ import Charts
 
 struct TemperatureChart: View {
     let weatherData: [WeatherData]
+    @State private var dragLocation: CGPoint = .zero
+    @State private var isDragging: Bool = false
+    @State private var selectedDate: String = ""
+    @State private var selectedTemps: [(city: String, minTemp: Int, maxTemp: Int)] = []
+
     var body: some View {
-        Chart {
-            ForEach(weatherData) { cityData in
-                temperatureAreaMarks(for: cityData)
-                temperatureLineMarks(for: cityData)
-            }
-        }
-        .chartXAxis {
-            AxisMarks(values: .automatic(desiredCount: 7)) { value in
-                AxisValueLabel {
-                    if let weekday = value.as(String.self) {
-                        Text(weekday)
+        GeometryReader { geometry in
+            ZStack {
+                Chart {
+                    ForEach(weatherData) { cityData in
+                        temperatureAreaMarks(for: cityData)
+                        temperatureLineMarks(for: cityData)
                     }
                 }
+                .chartXAxis {
+                    AxisMarks(values: .automatic(desiredCount: 7)) { value in
+                        AxisValueLabel {
+                            if let weekday = value.as(String.self) {
+                                Text(weekday)
+                            }
+                        }
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading)
+                }
+
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            let location = value.location
+                            dragLocation = location
+                            isDragging = true
+                            updateSelectedData(at: location, in: geometry.size)
+                        }
+                        .onEnded { _ in
+                            isDragging = false
+                        }
+                )
+
+                if isDragging {
+                    // Draw the vertical line
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(width: 2, height: 300)
+                        .position(x: dragLocation.x, y: 150) // 150 is half of the chart height
+                }
             }
-        }
-        .chartYAxis {
-            AxisMarks(position: .leading)
+
+            if isDragging {
+                VStack(alignment: .leading) {
+                    Text("Date: \(selectedDate)")
+                    ForEach(selectedTemps, id: \.city) { temp in
+                        Text("\(temp.city): \(temp.minTemp) / \(temp.maxTemp)")
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+            }
         }
         .chartLegend(position: .bottom, alignment: .center)
         .frame(height: 300)
@@ -70,7 +112,24 @@ struct TemperatureChart: View {
         }
         return ""
     }
+
+    private func updateSelectedData(at location: CGPoint, in size: CGSize) {
+        // Convert the drag location to the corresponding data point
+        let chartWidth = size.width
+
+        // Find the nearest data point
+        let index = Int(location.x / (chartWidth / CGFloat(weatherData[0].daily.time.count)))
+        if index >= 0 && index < weatherData[0].daily.time.count {
+            selectedDate = weatherData[0].daily.time[index]
+            selectedTemps = weatherData.map { cityData in
+                let minTemp = Int(cityData.daily.temperatureMin[index])
+                let maxTemp = Int(cityData.daily.temperatureMax[index])
+                return (city: cityData.city, minTemp: minTemp, maxTemp: maxTemp)
+            }
+        }
+    }
 }
+
 
 struct PrecipitationChart: View {
     let weatherData: [WeatherData]
